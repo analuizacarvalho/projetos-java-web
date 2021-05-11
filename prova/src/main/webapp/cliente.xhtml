@@ -1,0 +1,123 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui"
+	template="/WEB-INF/templates/Layout.xhtml">
+	
+	<ui:define name="content">
+	    <h1 class="aw-page-title">Cliente</h1>
+	    <h:form id="form">
+	        <div class="card crud-demo">
+		        <p:growl id="messages" showDetail="true"/>
+		        <p:fieldset legend="Buscar">
+		            <div class="p-grid">
+		                <p:selectOneRadio id="tipoPessoa" value="#{clienteWebBean.filtro.tipo}" unselectable="true">
+                            <f:selectItem itemLabel="Pessoa Física" itemValue="Pessoa Física"/>
+                            <f:selectItem itemLabel="Pessoa Jurídica" itemValue="Pessoa Jurídica"/>
+                            <p:ajax event="click" update="panelBusca" process="tipoPessoa" global="false" />
+                        </p:selectOneRadio>
+                        <p:outputPanel id="panelBusca" style="padding-top: 10px" class="ui-fluid">
+	                        <p:outputPanel rendered="#{clienteWebBean.renderizarPainelBuscaPessoaFisica()}">
+			                    <div class="p-field p-col-12 p-md-12 p-lg-12">
+				                    <p:outputLabel for="nomeFiltro">Nome:</p:outputLabel>
+				    				<p:inputText id="nomeFiltro" value="#{clienteWebBean.filtro.nome}">
+				    				    <p:ajax process="@this" global="false" />
+				    				</p:inputText>
+								</div>
+								<div class="p-field p-col-12 p-md-12 p-lg-12" style="padding-top: 10px">
+							        <p:outputLabel for="cpfFiltro">CPF:</p:outputLabel>
+									<p:inputMask id="cpfFiltro" value="#{clienteWebBean.filtro.cpf}" mask="999.999.999-99" validateMask="true">
+									    <p:ajax process="@this" global="false" />
+									</p:inputMask>
+				                </div>
+	                        </p:outputPanel>
+	                        <p:outputPanel rendered="#{clienteWebBean.renderizarPainelBuscaPessoaJuridica()}">
+		                        <div class="p-field p-col-12 p-md-12 p-lg-12">
+			                        <p:outputLabel for="razaoSocialFiltro">Razão Social:</p:outputLabel>
+			    		            <p:inputText id="razaoSocialFiltro" value="#{clienteWebBean.filtro.razaSocial}">
+			    		                <p:ajax process="@this" global="false" />
+			    		            </p:inputText>
+							    </div>
+							    <div class="p-field p-col-12 p-md-12 p-lg-12" style="padding-top: 10px">
+			                        <p:outputLabel for="nomeFantasiaFiltro">Nome Fantasia:</p:outputLabel>
+			    			        <p:inputText id="nomeFantasiaFiltro" value="#{clienteWebBean.filtro.nomeFantasia}">
+			    			            <p:ajax process="@this" global="false" />
+			    			        </p:inputText>
+							    </div>
+							    <div class="p-field p-col-12 p-md-12 p-lg-12" style="padding-top: 10px">
+							        <p:outputLabel for="cnpjFiltro">CNPJ:</p:outputLabel>
+							        <p:inputMask id="cnpjFiltro" value="#{clienteWebBean.filtro.cnpj}" mask="99.999.999/9999-99" validateMask="true">
+							            <p:ajax process="@this" global="false" />
+							        </p:inputMask>
+			                    </div>
+	                        </p:outputPanel>
+	                    </p:outputPanel>
+		            </div>
+		            <div class="p-grid" style="padding-bottom: 10px;padding-top: 10px">
+			            <p:commandButton value="Buscar Cliente" 
+			                             icon="pi pi-search"
+			                             actionListener="#{clienteWebBean.buscarClientes()}"
+			                             process="@this" 
+			                             update="tabelaClientes" />
+		            </div>
+		        </p:fieldset>
+		        <div class="p-grid" style="padding-bottom: 10px;padding-top: 10px">
+		            <p:commandButton value="Adicionar Cliente" 
+		                             icon="pi pi-plus" 
+		                             actionListener="#{clienteWebBean.abrirModalCadastro()}"
+		                             process="@this" 
+		                             update=":adicionarClienteForm" 
+		                             oncomplete="PF('modalCadastroCliente').show()"/>
+		        </div>
+	        	<p:dataTable id="tabelaClientes" 
+	                         widgetVar="dtProducts" 
+	                         var="cliente" 
+	                         value="#{clienteWebBean.clientes}"
+	                         reflow="true" 
+	                         styleClass="products-table"
+	                         rowKey="#{cliente.id}" 
+	                         paginator="true"
+	                         rows="10" 
+	                         rowSelectMode="add" 
+	                         paginatorPosition="bottom">
+	            
+	                <p:column headerText="Ação" style="width:100px;">
+	                    <p:commandButton icon="pi pi-pencil" 
+	                                     update=":adicionarClienteForm"
+	                                     actionListener="#{clienteWebBean.abrirModalEdicao(cliente)}"
+	                                     oncomplete="PF('modalCadastroCliente').show()"
+	                                     styleClass="edit-button rounded-button ui-button-success" 
+	                                     process="@this">
+	                        <p:resetInput target=":adicionarClienteForm"/>
+	                    </p:commandButton>
+	                    <p:commandButton class="ui-button-warning rounded-button" 
+	                                     icon="pi pi-trash" process="@this"
+	                                     oncomplete="PF('modalRemoverCliente').show()">
+	                        <f:setPropertyActionListener value="#{cliente}" target="#{clienteWebBean.clienteSelecionado}"/>
+	                    </p:commandButton>
+	                </p:column>
+	
+		            <p:column headerText="Código" style="width:50px;">
+		                <h:outputText value="#{cliente.id}"/>
+		            </p:column>
+	            
+		            <p:column headerText="Nome">
+		                <h:outputText value="#{cliente.nomeCliente()}"/>
+		            </p:column>
+		            
+		            <p:column headerText="Documento" style="width:150px;">
+		                <h:outputText value="#{cliente.documentoComMascara()}"/>
+		            </p:column>
+		            
+		            <p:column headerText="Tipo" style="width:150px;">
+		                <h:outputText value="#{cliente.tipo}"/>
+		            </p:column>
+	            </p:dataTable>
+	        </div>
+	    </h:form>
+	    <ui:include src="/adicionar-cliente-modal.xhtml" />
+	    <ui:include src="/remover-cliente-modal.xhtml" />
+	    <ui:include src="/adicionar-telefone-modal.xhtml" />
+    </ui:define>	
+</ui:composition>

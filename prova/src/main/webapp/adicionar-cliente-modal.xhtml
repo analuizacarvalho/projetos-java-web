@@ -1,0 +1,139 @@
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+	
+    <p:dialog header="Cliente" 
+                  showEffect="fade" 
+                  modal="true"
+                  width="500px"
+                  widgetVar="modalCadastroCliente" 
+                  responsive="true">
+        <h:form id="adicionarClienteForm">
+            <p:selectOneRadio id="tipoPessoa" value="#{clienteWebBean.clienteSelecionado.tipo}" disabled="#{clienteWebBean.clienteSelecionado.id != null}" unselectable="true">
+                <f:selectItem itemLabel="Pessoa Física" itemValue="Pessoa Física"/>
+                <f:selectItem itemLabel="Pessoa Jurídica" itemValue="Pessoa Jurídica"/>
+                <p:ajax event="change" update="panelInformacaoCliente,botaoSalvar" global="false" />
+            </p:selectOneRadio>
+	        <p:outputPanel id="panelInformacaoCliente" style="padding-top: 10px" class="ui-fluid">
+	            <p:outputPanel rendered="#{clienteWebBean.renderizarPainelPessoaFisica()}">
+	                <p:fieldset legend="Informações do Cliente">
+		                <div class="p-grid">
+		                    <div class="p-field p-col-12 p-md-12 p-lg-12">
+		                        <p:outputLabel for="nome">Nome:</p:outputLabel>
+		    				    <p:inputText id="nome" required="true" value="#{clienteWebBean.clienteSelecionado.nome}">
+		    				        <p:ajax process="@this" global="false" />
+		    				    </p:inputText>
+							</div>
+							<div class="p-field p-col-12 p-md-12 p-lg-12" style="padding-top: 10px">
+							    <p:outputLabel for="cpf">CPF:</p:outputLabel>
+							    <p:inputMask id="cpf" required="true" value="#{clienteWebBean.clienteSelecionado.cpf}" mask="999.999.999-99" validateMask="true">
+							        <p:ajax process="@this" global="false" />
+							    </p:inputMask>
+		                    </div>
+		                    <div class="p-field p-col-12 p-md-12 p-lg-12" style="padding-top: 10px">
+							    <p:outputLabel for="data">Data de Nascimento:</p:outputLabel>
+							    <p:datePicker id="data" required="true" value="#{clienteWebBean.clienteSelecionado.dataNascimento}">
+							        <p:ajax event="dateSelect" process="@this" global="false" />
+							    </p:datePicker>
+		                    </div>
+		                    <div class="p-field p-col-12 p-md-12 p-lg-12" style="padding-top: 10px">
+							    <p:outputLabel for="telefone">Telefone:</p:outputLabel>
+							    <p:inputMask id="telefone" required="true" value="#{clienteWebBean.clienteSelecionado.telefone}" mask="(99) 999-999999" validateMask="true">
+							        <p:ajax process="@this" global="false" />
+							    </p:inputMask>
+		                    </div>
+		                    <div class="p-field p-col-12 p-md-12 p-lg-12" style="padding-top: 10px">
+							    <p:outputLabel for="email">E-mail:</p:outputLabel>
+							    <p:inputText id="email" required="true" value="#{clienteWebBean.clienteSelecionado.email}">
+							        <p:ajax process="@this" global="false" />
+							    </p:inputText>
+		                    </div>
+						</div>
+					</p:fieldset>
+	            </p:outputPanel>
+
+	            <p:outputPanel rendered="#{clienteWebBean.renderizarPainelPessoaJuridica()}">
+		            <p:fieldset legend="Informações do Cliente">
+		                <div class="p-grid">
+		                    <div class="p-field p-col-12 p-md-12 p-lg-12">
+		                        <p:outputLabel for="razaoSocial">Razão Social:</p:outputLabel>
+		    		            <p:inputText id="razaoSocial" required="true" value="#{clienteWebBean.clienteSelecionado.razaoSocial}">
+		    		                <p:ajax process="@this" global="false" />
+		    		            </p:inputText>
+						    </div>
+						    <div class="p-field p-col-12 p-md-12 p-lg-12" style="padding-top: 10px">
+		                        <p:outputLabel for="nomeFantasia">Nome Fantasia:</p:outputLabel>
+		    			        <p:inputText id="nomeFantasia" required="true" value="#{clienteWebBean.clienteSelecionado.nomeFantasia}">
+		    			            <p:ajax process="@this" global="false" />
+		    			        </p:inputText>
+						    </div>
+						    <div class="p-field p-col-12 p-md-12 p-lg-12" style="padding-top: 10px">
+						        <p:outputLabel for="cnpj">CNPJ:</p:outputLabel>
+						        <p:inputMask id="cnpj" required="true" value="#{clienteWebBean.clienteSelecionado.cnpj}" mask="99.999.999/9999-99" validateMask="true">
+						            <p:ajax process="@this" global="false" />
+						        </p:inputMask>
+		                    </div>
+		                    <div class="p-field p-col-12 p-md-12 p-lg-12" style="padding-top: 10px">
+				                <p:commandButton id="botaoAdicionarTelefone"
+				                                 value="Adicionar Telefone"
+				                                 style="width: 300px"
+	                                             actionListener="#{clienteWebBean.abrirModalCadastroTelefone()}"
+	                                             process="@this"
+	                                             update=":adicionarTelefoneForm" 
+	                                             oncomplete="PF('modalCadastroTelefone').show()"/>
+							    <p:dataTable id="tabelaTelefone" 
+					                         style="width:300px"
+					                         var="telefonePessoaJuridica" 
+					                         value="#{clienteWebBean.clienteSelecionado.telefones}"
+					                         reflow="true" 
+					                         styleClass="products-table"
+					                         rowKey="#{telefone}" 
+					                         paginator="true"
+					                         rows="10" 
+					                         rowSelectMode="add" 
+					                         paginatorPosition="bottom">
+					               <p:column headerText="Ação" style="width:10px;">
+						                <p:commandButton icon="pi pi-pencil" 
+						                                 update=":adicionarTelefoneForm"
+						                                 style="width: 30px"
+						                                 actionListener="#{clienteWebBean.editarTelefone(telefonePessoaJuridica)}"
+						                                 oncomplete="PF('modalCadastroTelefone').show()"
+						                                 styleClass="edit-button rounded-button ui-button-success" 
+						                                 process="@this">
+						                </p:commandButton>
+						                <p:commandButton class="ui-button-warning rounded-button" 
+						                                 icon="pi pi-trash"
+						                                 style="width: 30px"
+						                                 process="@this"
+						                                 update="tabelaTelefone"
+						                                 actionListener="#{clienteWebBean.removerTelefone(telefonePessoaJuridica)}" />
+						            </p:column>
+							        <p:column headerText="Telefone" style="width:50px;">
+							            <h:outputText value="#{telefonePessoaJuridica.telefoneComMascara()}" />
+							        </p:column>
+					        	</p:dataTable>
+		                    </div>
+		                    <div class="p-field p-col-12 p-md-12 p-lg-12" style="padding-top: 10px">
+							    <p:outputLabel for="site">Site:</p:outputLabel>
+							    <p:inputText id="site" required="true" value="#{clienteWebBean.clienteSelecionado.site}">
+							        <p:ajax process="@this" global="false" />
+							    </p:inputText>
+		                    </div>
+						</div>
+					</p:fieldset>
+	            </p:outputPanel>
+	        </p:outputPanel>
+	        <div class="p-grid" style="padding-top: 10px">
+				    <p:commandButton id="botaoSalvar"
+				                     value="Salvar"
+				                     style="width: 150px"
+				                     disabled="#{clienteWebBean.desabilitarBotaoSalvar()}"
+	                                 actionListener="#{clienteWebBean.salvarCliente()}"
+	                                 process="adicionarClienteForm @this" 
+	                                 update="adicionarClienteForm" />
+			</div>
+        </h:form>
+    </p:dialog>
+</ui:composition>
